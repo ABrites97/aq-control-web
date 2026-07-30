@@ -6,6 +6,11 @@ export const metadata = {
   description: "Dashboard remoto do AQ-CONTROL",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt">
