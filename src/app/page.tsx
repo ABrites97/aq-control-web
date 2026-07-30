@@ -103,11 +103,9 @@ export default function Home() {
             </button>
           ))}
         </div>
-        <div className="text-sm text-gray-400 mt-3">
-          {aEnviar
-            ? "A enviar comando..."
-            : "O comando é aplicado na próxima verificação do ESP32 (até ~30s)"}
-        </div>
+        {aEnviar && (
+          <div className="text-sm text-[#ff9800] mt-3">A enviar comando...</div>
+        )}
       </Card>
 
       <Card titulo="🌡 Temperaturas">
