@@ -88,12 +88,12 @@ export default function Home() {
       </Card>
 
       <Card titulo="⚙️ Modo Caldeira">
-        <div className="flex justify-center flex-wrap gap-2">
+        <div className="flex justify-center flex-nowrap gap-1">
           {MODOS.map((m) => (
             <button
               key={m}
               onClick={() => enviarComando("modo", m)}
-              className={`text-lg px-4 py-2 rounded-xl font-semibold transition ${
+              className={`text-sm sm:text-lg px-2 sm:px-4 py-2 rounded-xl font-semibold transition whitespace-nowrap ${
                 ultima.modo === m
                   ? "bg-[#ff9800] shadow-[0_0_12px_#ff9800]"
                   : "bg-[#334155] hover:bg-[#ff9800]"
