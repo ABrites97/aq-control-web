@@ -116,7 +116,16 @@ export default function Home() {
 
   return (
     <main style={{ minHeight: "100vh", textAlign: "center", paddingBottom: "40px" }}>
-      <h1 style={{ background: "#0f172a", padding: "20px", margin: 0, color: "#ff9800" }}>
+      <h1
+        style={{
+          background: "#0f172a",
+          padding: "20px",
+          margin: 0,
+          color: "#ff9800",
+          fontSize: "36px",
+          fontWeight: "bold",
+        }}
+      >
         🔥 AQ-CONTROL
       </h1>
 
