@@ -7,15 +7,14 @@ export async function GET() {
     orderBy: { criadoEm: "desc" },
   });
 
-  const historicoDesc = await prisma.leitura.findMany({
-    orderBy: { criadoEm: "desc" },
-    take: 50,
+  const desde24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+  const historico = await prisma.leitura.findMany({
+    where: { criadoEm: { gte: desde24h } },
+    orderBy: { criadoEm: "asc" },
   });
 
-  return NextResponse.json({
-    ultima,
-    historico: historicoDesc.reverse(), // do mais antigo para o mais recente, para o gráfico
-  });
+  return NextResponse.json({ ultima, historico });
 }
 
 // Usado pelo ESP32 para enviar uma nova leitura - exige a chave secreta

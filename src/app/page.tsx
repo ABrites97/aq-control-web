@@ -75,9 +75,12 @@ export default function Home() {
         🔥 AQ-CONTROL
       </h1>
 
-      <Card titulo="🕒 Última Leitura Recebida">
+      <Card titulo="🕒 Data e Hora">
         <div className="text-3xl font-bold text-[#00e676]">
-          {new Date(ultima.criadoEm).toLocaleTimeString("pt-PT")}
+          {new Date(ultima.criadoEm).toLocaleTimeString("pt-PT", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </div>
         <div className="text-lg text-[#cbd5e1] mt-1">
           {new Date(ultima.criadoEm).toLocaleDateString("pt-PT")}
@@ -128,14 +131,12 @@ export default function Home() {
           valor={ultima.rele3Ligado ? "🟢 ON" : "🔴 OFF"}
           ligado={ultima.rele3Ligado}
         />
-      </Card>
 
-      <Card titulo="⏸️ Radiadores">
         <button
           onClick={() =>
             enviarComando("radiadores_pausa", ultima.radiadoresPausados ? "0" : "1")
           }
-          className={`text-lg px-5 py-3 rounded-xl font-semibold transition ${
+          className={`text-lg px-5 py-3 mt-4 rounded-xl font-semibold transition w-full ${
             ultima.radiadoresPausados
               ? "bg-[#ff9800] shadow-[0_0_12px_#ff9800]"
               : "bg-[#334155] hover:bg-[#ff9800]"
@@ -145,7 +146,7 @@ export default function Home() {
         </button>
       </Card>
 
-      <Card titulo="📈 Histórico de Temperaturas">
+      <Card titulo="📈 Histórico de Temperaturas (24h)">
         <div className="h-64 w-full">
           <ResponsiveContainer>
             <LineChart data={historico}>
