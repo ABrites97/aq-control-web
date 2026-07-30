@@ -1,26 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { chaveApiValida } from "@/lib/auth";
 
-// Chamado pelo ESP32 depois de aplicar um comando, para nao o voltar a aplicar
-// na proxima vez que perguntar quais estao pendentes.
+// Usado pelo ESP32 para marcar um comando como aplicado - exige a chave secreta
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  if (!chaveApiValida(req)) {
-    return NextResponse.json({ erro: "Chave de API invalida" }, { status: 401 });
+  const apiKey = req.headers.get("x-api-key");
+
+  if (apiKey !== process.env.ESP32_API_KEY) {
+    return NextResponse.json({ erro: "nao autorizado" }, { status: 401 });
   }
 
-  const id = Number(params.id);
-  if (Number.isNaN(id)) {
-    return NextResponse.json({ erro: "id invalido" }, { status: 400 });
-  }
+  const id = parseInt(params.id, 10);
 
-  await prisma.comando.update({
+  const comando = await prisma.comando.update({
     where: { id },
     data: { aplicado: true, aplicadoEm: new Date() },
   });
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, comando });
 }
