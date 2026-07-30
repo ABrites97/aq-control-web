@@ -67,7 +67,7 @@ export default function Home() {
 
   return (
     <div>
-      <h1>🔥 AQ-CONTROL</h1>
+      <h1>🔥 AQ-CONTROL 🚿</h1>
 
       <div className="card">
         <div className="titulo">🕒 Data e Hora</div>
