@@ -32,6 +32,7 @@ h1{
   width:90%;
   max-width:420px;
   text-align:center;
+  box-sizing:content-box;
 }
 
 .titulo{
