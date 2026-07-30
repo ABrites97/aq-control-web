@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Cada leitura enviada periodicamente pelo ESP32 - guarda o historico completo
+model Leitura {
+  id                 Int      @id @default(autoincrement())
+  criadoEm           DateTime @default(now())
+  tempCaldeira       Float
+  tempAQS            Float
+  rele1Ligado        Boolean
+  rele2Ligado        Boolean
+  rele3Ligado        Boolean
+  modo               String
+  radiadoresPausados Boolean
+
+  @@index([criadoEm])
+}
+
+// "Caixa de correio" - o dashboard cria comandos aqui, o ESP32 vem busca-los
+model Comando {
+  id        Int      @id @default(autoincrement())
+  criadoEm  DateTime @default(now())
+  tipo      String   // "modo" | "radiadores_pausa" | "horario" | "temp_config"
+  valor     String   // conteudo do comando (texto simples ou JSON, conforme o tipo)
+  aplicado  Boolean  @default(false)
+  aplicadoEm DateTime?
+
+  @@index([aplicado])
+}
