@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, ReactNode } from "react";
+import { useEffect, useState, useCallback, CSSProperties } from "react";
 import {
   LineChart,
   Line,
@@ -25,6 +25,43 @@ type Leitura = {
 };
 
 const MODOS = ["ON", "INVERNO", "VERAO", "OFF"];
+
+// Valores copiados diretamente do CSS da pagina local do ESP32,
+// para as duas paginas ficarem visualmente identicas.
+const cardStyle: CSSProperties = {
+  background: "#1e293b",
+  margin: "15px auto",
+  padding: "20px",
+  borderRadius: "18px",
+  width: "90%",
+  maxWidth: "420px",
+  textAlign: "center",
+};
+
+const tituloStyle: CSSProperties = {
+  fontSize: "22px",
+  marginBottom: "15px",
+};
+
+const linhaStyle: CSSProperties = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  textAlign: "center",
+  gap: "10px",
+  fontSize: "22px",
+  margin: "15px",
+};
+
+const botaoBaseStyle: CSSProperties = {
+  fontSize: "18px",
+  padding: "12px 15px",
+  margin: "5px",
+  borderRadius: "12px",
+  border: 0,
+  color: "white",
+  cursor: "pointer",
+};
 
 export default function Home() {
   const [ultima, setUltima] = useState<Leitura | null>(null);
@@ -63,90 +100,115 @@ export default function Home() {
 
   if (!ultima) {
     return (
-      <main className="min-h-screen flex items-center justify-center text-center">
+      <main
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+        }}
+      >
         A carregar dados...
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen text-center pb-16">
-      <h1 className="bg-[#0f172a] text-[#ff9800] text-3xl py-5 m-0">
+    <main style={{ minHeight: "100vh", textAlign: "center", paddingBottom: "40px" }}>
+      <h1 style={{ background: "#0f172a", padding: "20px", margin: 0, color: "#ff9800" }}>
         🔥 AQ-CONTROL
       </h1>
 
-      <Card titulo="🕒 Data e Hora">
-        <div className="text-3xl font-bold text-[#00e676]">
+      <div style={cardStyle}>
+        <div style={tituloStyle}>🕒 Data e Hora</div>
+        <div style={{ fontSize: "38px", fontWeight: "bold", color: "#00e676" }}>
           {new Date(ultima.criadoEm).toLocaleTimeString("pt-PT", {
             hour: "2-digit",
             minute: "2-digit",
           })}
         </div>
-        <div className="text-lg text-[#cbd5e1] mt-1">
+        <div style={{ fontSize: "20px", color: "#cbd5e1" }}>
           {new Date(ultima.criadoEm).toLocaleDateString("pt-PT")}
         </div>
-      </Card>
+      </div>
 
-      <Card titulo="⚙️ Modo Caldeira">
-        <div className="flex justify-center flex-nowrap" style={{ gap: "5px" }}>
+      <div style={cardStyle}>
+        <div style={tituloStyle}>⚙️ Modo Caldeira</div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexWrap: "nowrap",
+            gap: "5px",
+          }}
+        >
           {MODOS.map((m) => (
             <button
               key={m}
               onClick={() => enviarComando("modo", m)}
-              style={{ fontSize: "18px", padding: "10px 14px" }}
-              className={`rounded-xl font-semibold transition whitespace-nowrap ${
-                ultima.modo === m
-                  ? "bg-[#ff9800] shadow-[0_0_12px_#ff9800]"
-                  : "bg-[#334155] hover:bg-[#ff9800]"
-              }`}
+              style={{
+                fontSize: "18px",
+                padding: "10px 14px",
+                margin: "3px",
+                borderRadius: "12px",
+                border: 0,
+                color: "white",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                background: ultima.modo === m ? "#ff9800" : "#334155",
+                boxShadow: ultima.modo === m ? "0 0 12px #ff9800" : "none",
+              }}
             >
               {m === "VERAO" ? "VERÃO" : m}
             </button>
           ))}
         </div>
         {aEnviar && (
-          <div className="text-sm text-[#ff9800] mt-3">A enviar comando...</div>
+          <div style={{ fontSize: "14px", color: "#ff9800", marginTop: "10px" }}>
+            A enviar comando...
+          </div>
         )}
-      </Card>
+      </div>
 
-      <Card titulo="🌡 Temperaturas">
-        <Linha label="🔥 Caldeira:" valor={`${ultima.tempCaldeira.toFixed(1)} °C`} />
-        <Linha label="🚿 AQS:" valor={`${ultima.tempAQS.toFixed(1)} °C`} />
-      </Card>
+      <div style={cardStyle}>
+        <div style={tituloStyle}>🌡 Temperaturas</div>
+        <div style={linhaStyle}>
+          <span>🔥 Caldeira:</span>
+          <span>{ultima.tempCaldeira.toFixed(1)} °C</span>
+        </div>
+        <div style={linhaStyle}>
+          <span>🚿 AQS:</span>
+          <span>{ultima.tempAQS.toFixed(1)} °C</span>
+        </div>
+      </div>
 
-      <Card titulo="⚡ Saídas">
-        <Linha
-          label="Ordem Caldeira:"
-          valor={ultima.rele1Ligado ? "🟢 ON" : "🔴 OFF"}
-          ligado={ultima.rele1Ligado}
-        />
-        <Linha
-          label="Bomba Caldeira:"
-          valor={ultima.rele2Ligado ? "🟢 ON" : "🔴 OFF"}
-          ligado={ultima.rele2Ligado}
-        />
-        <Linha
-          label="Bomba Aquecimento:"
-          valor={ultima.rele3Ligado ? "🟢 ON" : "🔴 OFF"}
-          ligado={ultima.rele3Ligado}
-        />
+      <div style={cardStyle}>
+        <div style={tituloStyle}>⚡ Saídas</div>
+        <Linha label="Ordem Caldeira:" ligado={ultima.rele1Ligado} />
+        <Linha label="Bomba Caldeira:" ligado={ultima.rele2Ligado} />
+        <Linha label="Bomba Aquecimento:" ligado={ultima.rele3Ligado} />
 
         <button
           onClick={() =>
             enviarComando("radiadores_pausa", ultima.radiadoresPausados ? "0" : "1")
           }
-          className={`text-lg px-5 py-3 mt-4 rounded-xl font-semibold transition w-full ${
-            ultima.radiadoresPausados
-              ? "bg-[#ff9800] shadow-[0_0_12px_#ff9800]"
-              : "bg-[#334155] hover:bg-[#ff9800]"
-          }`}
+          style={{
+            ...botaoBaseStyle,
+            width: "90%",
+            marginTop: "15px",
+            background: ultima.radiadoresPausados ? "#ff9800" : "#334155",
+            boxShadow: ultima.radiadoresPausados ? "0 0 12px #ff9800" : "none",
+          }}
         >
           {ultima.radiadoresPausados ? "▶️ Retomar Radiadores" : "⏸️ Pausar Radiadores"}
         </button>
-      </Card>
+      </div>
 
-      <Card titulo="📈 Histórico de Temperaturas (24h)">
-        <div className="h-64 w-full">
+      <div style={cardStyle}>
+        <div style={tituloStyle}>📈 Histórico de Temperaturas (24h)</div>
+        <div style={{ height: "256px", width: "100%" }}>
           <ResponsiveContainer>
             <LineChart data={historico}>
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -172,36 +234,18 @@ export default function Home() {
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </Card>
+      </div>
     </main>
   );
 }
 
-function Card({ titulo, children }: { titulo: string; children: ReactNode }) {
+function Linha({ label, ligado }: { label: string; ligado: boolean }) {
   return (
-    <div className="bg-[#1e293b] mx-auto my-4 p-5 rounded-2xl w-[90%] max-w-md">
-      <div className="text-xl mb-3">{titulo}</div>
-      {children}
-    </div>
-  );
-}
-
-function Linha({
-  label,
-  valor,
-  ligado,
-}: {
-  label: string;
-  valor: string;
-  ligado?: boolean;
-}) {
-  const cor =
-    ligado === undefined ? "" : ligado ? "text-[#00ff00] font-bold" : "text-[#ff3333] font-bold";
-
-  return (
-    <div className="flex justify-center items-center gap-2 text-lg my-2">
+    <div style={linhaStyle}>
       <span>{label}</span>
-      <span className={cor}>{valor}</span>
+      <span style={{ color: ligado ? "#00ff00" : "#ff3333", fontWeight: "bold" }}>
+        {ligado ? "🟢 ON" : "🔴 OFF"}
+      </span>
     </div>
   );
 }
