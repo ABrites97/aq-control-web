@@ -2,9 +2,101 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background: #111827;
-  color: white;
-  font-family: Arial, Helvetica, sans-serif;
-  margin: 0;
+/* ============================================
+   CSS copiado literalmente da pagina local do
+   ESP32, para as duas paginas ficarem identicas.
+   ============================================ */
+
+body{
+  background:#111827;
+  font-family:Arial, sans-serif;
+  color:white;
+  text-align:center;
+  margin:0;
+}
+
+h1{
+  background:#0f172a;
+  padding:20px;
+  margin:0;
+  color:#ff9800;
+  font-size:32px;
+  font-weight:bold;
+}
+
+.card{
+  background:#1e293b;
+  margin:15px auto;
+  padding:20px;
+  border-radius:18px;
+  width:90%;
+  max-width:420px;
+  text-align:center;
+}
+
+.titulo{
+  font-size:22px;
+  margin-bottom:15px;
+}
+
+.valor{
+  font-size:38px;
+  font-weight:bold;
+  color:#00e676;
+}
+
+.data{
+  font-size:20px;
+  color:#cbd5e1;
+}
+
+.linha{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  gap:10px;
+  font-size:22px;
+  margin:15px;
+}
+
+.ligado{
+  color:#00ff00;
+  font-weight:bold;
+}
+
+.desligado{
+  color:#ff3333;
+  font-weight:bold;
+}
+
+.aq-btn{
+  font-size:18px;
+  padding:12px 15px;
+  margin:5px;
+  border-radius:12px;
+  border:0;
+  background:#334155;
+  color:white;
+  cursor:pointer;
+}
+
+.ativo{
+  background:#ff9800 !important;
+  color:white;
+  box-shadow:0 0 12px #ff9800;
+}
+
+.modos{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:nowrap;
+  gap:5px;
+}
+
+.modos .aq-btn{
+  font-size:18px;
+  padding:10px 14px;
+  margin:3px;
 }

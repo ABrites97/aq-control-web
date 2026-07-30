@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, CSSProperties } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   LineChart,
   Line,
@@ -25,43 +25,6 @@ type Leitura = {
 };
 
 const MODOS = ["ON", "INVERNO", "VERAO", "OFF"];
-
-// Valores copiados diretamente do CSS da pagina local do ESP32,
-// para as duas paginas ficarem visualmente identicas.
-const cardStyle: CSSProperties = {
-  background: "#1e293b",
-  margin: "15px auto",
-  padding: "20px",
-  borderRadius: "18px",
-  width: "90%",
-  maxWidth: "420px",
-  textAlign: "center",
-};
-
-const tituloStyle: CSSProperties = {
-  fontSize: "22px",
-  marginBottom: "15px",
-};
-
-const linhaStyle: CSSProperties = {
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  textAlign: "center",
-  gap: "10px",
-  fontSize: "22px",
-  margin: "15px",
-};
-
-const botaoBaseStyle: CSSProperties = {
-  fontSize: "18px",
-  padding: "12px 15px",
-  margin: "5px",
-  borderRadius: "12px",
-  border: 0,
-  color: "white",
-  cursor: "pointer",
-};
 
 export default function Home() {
   const [ultima, setUltima] = useState<Leitura | null>(null);
@@ -99,76 +62,34 @@ export default function Home() {
   }
 
   if (!ultima) {
-    return (
-      <main
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-        }}
-      >
-        A carregar dados...
-      </main>
-    );
+    return <div>A carregar dados...</div>;
   }
 
   return (
-    <main style={{ minHeight: "100vh", textAlign: "center", paddingBottom: "40px" }}>
-      <h1
-        style={{
-          background: "#0f172a",
-          padding: "20px",
-          margin: 0,
-          color: "#ff9800",
-          fontSize: "36px",
-          fontWeight: "bold",
-        }}
-      >
-        🔥 AQ-CONTROL
-      </h1>
+    <div>
+      <h1>🔥 AQ-CONTROL 🚿</h1>
 
-      <div style={cardStyle}>
-        <div style={tituloStyle}>🕒 Data e Hora</div>
-        <div style={{ fontSize: "38px", fontWeight: "bold", color: "#00e676" }}>
+      <div className="card">
+        <div className="titulo">🕒 Data e Hora</div>
+        <div className="valor">
           {new Date(ultima.criadoEm).toLocaleTimeString("pt-PT", {
             hour: "2-digit",
             minute: "2-digit",
           })}
         </div>
-        <div style={{ fontSize: "20px", color: "#cbd5e1" }}>
+        <div className="data">
           {new Date(ultima.criadoEm).toLocaleDateString("pt-PT")}
         </div>
       </div>
 
-      <div style={cardStyle}>
-        <div style={tituloStyle}>⚙️ Modo Caldeira</div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexWrap: "nowrap",
-            gap: "5px",
-          }}
-        >
+      <div className="card">
+        <div className="titulo">⚙️ Modo Caldeira</div>
+        <div className="modos">
           {MODOS.map((m) => (
             <button
               key={m}
+              className={`aq-btn ${ultima.modo === m ? "ativo" : ""}`}
               onClick={() => enviarComando("modo", m)}
-              style={{
-                fontSize: "18px",
-                padding: "10px 14px",
-                margin: "3px",
-                borderRadius: "12px",
-                border: 0,
-                color: "white",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-                background: ultima.modo === m ? "#ff9800" : "#334155",
-                boxShadow: ultima.modo === m ? "0 0 12px #ff9800" : "none",
-              }}
             >
               {m === "VERAO" ? "VERÃO" : m}
             </button>
@@ -181,42 +102,37 @@ export default function Home() {
         )}
       </div>
 
-      <div style={cardStyle}>
-        <div style={tituloStyle}>🌡 Temperaturas</div>
-        <div style={linhaStyle}>
+      <div className="card">
+        <div className="titulo">🌡 Temperaturas</div>
+        <div className="linha">
           <span>🔥 Caldeira:</span>
           <span>{ultima.tempCaldeira.toFixed(1)} °C</span>
         </div>
-        <div style={linhaStyle}>
+        <div className="linha">
           <span>🚿 AQS:</span>
           <span>{ultima.tempAQS.toFixed(1)} °C</span>
         </div>
       </div>
 
-      <div style={cardStyle}>
-        <div style={tituloStyle}>⚡ Saídas</div>
+      <div className="card">
+        <div className="titulo">⚡ Saídas</div>
         <Linha label="Ordem Caldeira:" ligado={ultima.rele1Ligado} />
         <Linha label="Bomba Caldeira:" ligado={ultima.rele2Ligado} />
         <Linha label="Bomba Aquecimento:" ligado={ultima.rele3Ligado} />
 
         <button
+          className={`aq-btn ${ultima.radiadoresPausados ? "ativo" : ""}`}
+          style={{ width: "90%" }}
           onClick={() =>
             enviarComando("radiadores_pausa", ultima.radiadoresPausados ? "0" : "1")
           }
-          style={{
-            ...botaoBaseStyle,
-            width: "90%",
-            marginTop: "15px",
-            background: ultima.radiadoresPausados ? "#ff9800" : "#334155",
-            boxShadow: ultima.radiadoresPausados ? "0 0 12px #ff9800" : "none",
-          }}
         >
           {ultima.radiadoresPausados ? "▶️ Retomar Radiadores" : "⏸️ Pausar Radiadores"}
         </button>
       </div>
 
-      <div style={cardStyle}>
-        <div style={tituloStyle}>📈 Histórico de Temperaturas (24h)</div>
+      <div className="card">
+        <div className="titulo">📈 Histórico de Temperaturas (24h)</div>
         <div style={{ height: "256px", width: "100%" }}>
           <ResponsiveContainer>
             <LineChart data={historico}>
@@ -244,15 +160,15 @@ export default function Home() {
           </ResponsiveContainer>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
 function Linha({ label, ligado }: { label: string; ligado: boolean }) {
   return (
-    <div style={linhaStyle}>
+    <div className="linha">
       <span>{label}</span>
-      <span style={{ color: ligado ? "#00ff00" : "#ff3333", fontWeight: "bold" }}>
+      <span className={ligado ? "ligado" : "desligado"}>
         {ligado ? "🟢 ON" : "🔴 OFF"}
       </span>
     </div>
