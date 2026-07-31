@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   LineChart,
   Line,
@@ -31,12 +31,19 @@ export default function Home() {
   const [historico, setHistorico] = useState<Leitura[]>([]);
   const [aEnviar, setAEnviar] = useState(false);
 
+  // A "Data e Hora" so atualiza a cada 30s - o resto (reles, temperaturas, modo)
+  // continua a atualizar a cada 5s. Usamos uma ref para guardar sempre a leitura
+  // mais recente, sem forcar a caixa da hora a mudar antes dos 30s passarem.
+  const ultimaRef = useRef<Leitura | null>(null);
+  const [horaExibidaEm, setHoraExibidaEm] = useState<string | null>(null);
+
   const carregar = useCallback(async () => {
     try {
       const res = await fetch("/api/leituras", { cache: "no-store" });
       const dados = await res.json();
       setUltima(dados.ultima);
       setHistorico(dados.historico);
+      ultimaRef.current = dados.ultima;
     } catch (e) {
       console.error(e);
     }
@@ -47,6 +54,15 @@ export default function Home() {
     const t = setInterval(carregar, 5000);
     return () => clearInterval(t);
   }, [carregar]);
+
+  useEffect(() => {
+    const atualizarHora = () => {
+      if (ultimaRef.current) setHoraExibidaEm(ultimaRef.current.criadoEm);
+    };
+    atualizarHora(); // mostra logo a primeira leitura, sem esperar 30s
+    const t = setInterval(atualizarHora, 30000);
+    return () => clearInterval(t);
+  }, []);
 
   async function enviarComando(tipo: string, valor: string) {
     setAEnviar(true);
@@ -67,18 +83,19 @@ export default function Home() {
 
   return (
     <div>
-      <h1>🔥 AQ-CONTROL 🚿</h1>
+      <h1>🔥 AQ-CONTROL</h1>
 
       <div className="card">
         <div className="titulo">🕒 Data e Hora</div>
         <div className="valor">
-          {new Date(ultima.criadoEm).toLocaleTimeString("pt-PT", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
+          {horaExibidaEm &&
+            new Date(horaExibidaEm).toLocaleTimeString("pt-PT", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
         </div>
         <div className="data">
-          {new Date(ultima.criadoEm).toLocaleDateString("pt-PT")}
+          {horaExibidaEm && new Date(horaExibidaEm).toLocaleDateString("pt-PT")}
         </div>
       </div>
 
@@ -159,6 +176,16 @@ export default function Home() {
             </LineChart>
           </ResponsiveContainer>
         </div>
+      </div>
+
+      <div className="card">
+        <a
+          href="http://192.168.68.200"
+          className="aq-btn"
+          style={{ display: "inline-block", textDecoration: "none", width: "90%" }}
+        >
+          ⚙️ Modo Programador
+        </a>
       </div>
     </div>
   );
