@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   LineChart,
   Line,
@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  ReferenceArea,
 } from "recharts";
 
 type Leitura = {
@@ -26,10 +27,53 @@ type Leitura = {
 
 const MODOS = ["ON", "INVERNO", "VERAO", "OFF"];
 
+// Agrupa leituras consecutivas em que um rele esteve ligado, em intervalos [inicio, fim]
+function gerarIntervalos(
+  dados: (Leitura & { ts: number })[],
+  campo: "rele2Ligado" | "rele3Ligado"
+): { inicio: number; fim: number }[] {
+  const intervalos: { inicio: number; fim: number }[] = [];
+  let inicioAtual: number | null = null;
+
+  dados.forEach((d) => {
+    if (d[campo] && inicioAtual === null) {
+      inicioAtual = d.ts;
+    }
+    if (!d[campo] && inicioAtual !== null) {
+      intervalos.push({ inicio: inicioAtual, fim: d.ts });
+      inicioAtual = null;
+    }
+  });
+
+  if (inicioAtual !== null && dados.length > 0) {
+    intervalos.push({ inicio: inicioAtual, fim: dados[dados.length - 1].ts });
+  }
+
+  return intervalos;
+}
+function gerarTicksHoras(inicio: number, fim: number): number[] {
+  const ticks: number[] = [];
+  const d = new Date(fim);
+  d.setMinutes(0, 0, 0);
+  if (d.getHours() % 2 !== 0) d.setHours(d.getHours() - 1);
+  let t = d.getTime();
+  while (t >= inicio) {
+    ticks.push(t);
+    t -= 2 * 60 * 60 * 1000;
+  }
+  return ticks.reverse();
+}
+
 export default function Home() {
   const [ultima, setUltima] = useState<Leitura | null>(null);
   const [historico, setHistorico] = useState<Leitura[]>([]);
   const [aEnviar, setAEnviar] = useState(false);
+
+  // A "Data e Hora" so atualiza a cada 30s - o resto (reles, temperaturas, modo)
+  // continua a atualizar a cada 5s. Usamos uma ref para guardar sempre a leitura
+  // mais recente, sem forcar a caixa da hora a mudar antes dos 30s passarem.
+  const ultimaRef = useRef<Leitura | null>(null);
+  const [horaExibidaEm, setHoraExibidaEm] = useState<string | null>(null);
 
   const carregar = useCallback(async () => {
     try {
@@ -37,6 +81,7 @@ export default function Home() {
       const dados = await res.json();
       setUltima(dados.ultima);
       setHistorico(dados.historico);
+      ultimaRef.current = dados.ultima;
     } catch (e) {
       console.error(e);
     }
@@ -47,6 +92,15 @@ export default function Home() {
     const t = setInterval(carregar, 5000);
     return () => clearInterval(t);
   }, [carregar]);
+
+  useEffect(() => {
+    const atualizarHora = () => {
+      if (ultimaRef.current) setHoraExibidaEm(ultimaRef.current.criadoEm);
+    };
+    atualizarHora(); // mostra logo a primeira leitura, sem esperar 30s
+    const t = setInterval(atualizarHora, 30000);
+    return () => clearInterval(t);
+  }, []);
 
   async function enviarComando(tipo: string, valor: string) {
     setAEnviar(true);
@@ -65,6 +119,10 @@ export default function Home() {
     return <div>A carregar dados...</div>;
   }
 
+  const dadosGrafico = historico.map((h) => ({ ...h, ts: new Date(h.criadoEm).getTime() }));
+  const intervalosBombaCaldeira = gerarIntervalos(dadosGrafico, "rele2Ligado");
+  const intervalosBombaAquecimento = gerarIntervalos(dadosGrafico, "rele3Ligado");
+
   return (
     <div>
       <h1>🔥 AQ-CONTROL 🚿</h1>
@@ -72,13 +130,14 @@ export default function Home() {
       <div className="card">
         <div className="titulo">🕒 Data e Hora</div>
         <div className="valor">
-          {new Date(ultima.criadoEm).toLocaleTimeString("pt-PT", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
+          {horaExibidaEm &&
+            new Date(horaExibidaEm).toLocaleTimeString("pt-PT", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
         </div>
         <div className="data">
-          {new Date(ultima.criadoEm).toLocaleDateString("pt-PT")}
+          {horaExibidaEm && new Date(horaExibidaEm).toLocaleDateString("pt-PT")}
         </div>
       </div>
 
@@ -133,12 +192,18 @@ export default function Home() {
 
       <div className="card">
         <div className="titulo">📈 Histórico de Temperaturas (24h)</div>
-        <div style={{ height: "256px", width: "100%" }}>
+        <div style={{ height: "256px", width: "100%", display: "flex", justifyContent: "center" }}>
           <ResponsiveContainer>
-            <LineChart data={historico}>
+            <LineChart
+              data={dadosGrafico}
+              margin={{ top: 10, right: 15, left: -15, bottom: 0 }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
               <XAxis
-                dataKey="criadoEm"
+                dataKey="ts"
+                type="number"
+                domain={[Date.now() - 24 * 60 * 60 * 1000, Date.now()]}
+                ticks={gerarTicksHoras(Date.now() - 24 * 60 * 60 * 1000, Date.now())}
                 tickFormatter={(v) =>
                   new Date(v).toLocaleTimeString("pt-PT", {
                     hour: "2-digit",
@@ -148,16 +213,55 @@ export default function Home() {
                 stroke="#cbd5e1"
                 fontSize={12}
               />
-              <YAxis stroke="#cbd5e1" fontSize={12} />
+              <YAxis
+                domain={[10, 100]}
+                ticks={[10, 20, 30, 40, 50, 60, 70, 80, 90, 100]}
+                stroke="#cbd5e1"
+                fontSize={12}
+                width={35}
+              />
               <Tooltip
                 labelFormatter={(v) => new Date(v).toLocaleString("pt-PT")}
                 contentStyle={{ background: "#1e293b", border: "none", color: "white" }}
               />
               <Legend />
-              <Line type="monotone" dataKey="tempCaldeira" name="Caldeira" stroke="#ff9800" dot={false} strokeWidth={2} />
-              <Line type="monotone" dataKey="tempAQS" name="AQS" stroke="#00e676" dot={false} strokeWidth={2} />
+
+              {intervalosBombaCaldeira.map((iv, idx) => (
+                <ReferenceArea
+                  key={"bc" + idx}
+                  x1={iv.inicio}
+                  x2={iv.fim}
+                  strokeOpacity={0}
+                  fill="#ef4444"
+                  fillOpacity={0.22}
+                />
+              ))}
+              {intervalosBombaAquecimento.map((iv, idx) => (
+                <ReferenceArea
+                  key={"ba" + idx}
+                  x1={iv.inicio}
+                  x2={iv.fim}
+                  strokeOpacity={0}
+                  fill="#22d3ee"
+                  fillOpacity={0.22}
+                />
+              ))}
+
+              <Line type="monotone" dataKey="tempCaldeira" name="Caldeira" stroke="#ef4444" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="tempAQS" name="AQS" stroke="#38bdf8" dot={false} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "center", gap: "18px", marginTop: "12px", fontSize: "13px", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ width: "14px", height: "14px", background: "#ef4444", opacity: 0.5, display: "inline-block", borderRadius: "3px" }} />
+            Bomba Caldeira ON
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ width: "14px", height: "14px", background: "#22d3ee", opacity: 0.5, display: "inline-block", borderRadius: "3px" }} />
+            Bomba Aquecimento ON
+          </div>
         </div>
       </div>
 
