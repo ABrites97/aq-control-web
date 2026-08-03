@@ -204,12 +204,7 @@ export default function Home() {
                 domain={[Date.now() - 24 * 60 * 60 * 1000, Date.now()]}
                 ticks={gerarTicksHoras(Date.now() - 24 * 60 * 60 * 1000, Date.now())}
                 interval={0}
-                tickFormatter={(v) =>
-                  new Date(v).toLocaleTimeString("pt-PT", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                }
+                tickFormatter={(v) => new Date(v).getHours() + "h"}
                 stroke="#cbd5e1"
                 fontSize={11}
               />
@@ -253,7 +248,7 @@ export default function Home() {
           </ResponsiveContainer>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", marginTop: "10px", fontSize: "11px", flexWrap: "nowrap", overflowX: "auto", whiteSpace: "nowrap" }}>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", marginTop: "10px", fontSize: "14px", flexWrap: "nowrap", overflowX: "auto", whiteSpace: "nowrap" }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
             <span style={{ width: "12px", height: "2px", background: "#ef4444", display: "inline-block" }} />
             Caldeira
