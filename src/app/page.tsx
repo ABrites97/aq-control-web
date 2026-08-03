@@ -8,7 +8,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
   ReferenceArea,
 } from "recharts";
@@ -196,7 +195,7 @@ export default function Home() {
           <ResponsiveContainer>
             <LineChart
               data={dadosGrafico}
-              margin={{ top: 10, right: 15, left: -15, bottom: 0 }}
+              margin={{ top: 10, right: 15, left: -5, bottom: 0 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
               <XAxis
@@ -204,6 +203,7 @@ export default function Home() {
                 type="number"
                 domain={[Date.now() - 24 * 60 * 60 * 1000, Date.now()]}
                 ticks={gerarTicksHoras(Date.now() - 24 * 60 * 60 * 1000, Date.now())}
+                interval={0}
                 tickFormatter={(v) =>
                   new Date(v).toLocaleTimeString("pt-PT", {
                     hour: "2-digit",
@@ -211,20 +211,20 @@ export default function Home() {
                   })
                 }
                 stroke="#cbd5e1"
-                fontSize={12}
+                fontSize={11}
               />
               <YAxis
                 domain={[10, 100]}
                 ticks={[10, 20, 30, 40, 50, 60, 70, 80, 90, 100]}
                 stroke="#cbd5e1"
                 fontSize={12}
-                width={35}
+                width={42}
+                allowDataOverflow
               />
               <Tooltip
                 labelFormatter={(v) => new Date(v).toLocaleString("pt-PT")}
                 contentStyle={{ background: "#1e293b", border: "none", color: "white" }}
               />
-              <Legend />
 
               {intervalosBombaCaldeira.map((iv, idx) => (
                 <ReferenceArea
@@ -253,15 +253,23 @@ export default function Home() {
           </ResponsiveContainer>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "center", gap: "18px", marginTop: "12px", fontSize: "13px", flexWrap: "wrap" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ width: "14px", height: "14px", background: "#ef4444", opacity: 0.5, display: "inline-block", borderRadius: "3px" }} />
-            Bomba Caldeira ON
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ width: "14px", height: "14px", background: "#22d3ee", opacity: 0.5, display: "inline-block", borderRadius: "3px" }} />
-            Bomba Aquecimento ON
-          </div>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", marginTop: "10px", fontSize: "11px", flexWrap: "nowrap", overflowX: "auto", whiteSpace: "nowrap" }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <span style={{ width: "12px", height: "2px", background: "#ef4444", display: "inline-block" }} />
+            Caldeira
+          </span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <span style={{ width: "12px", height: "2px", background: "#38bdf8", display: "inline-block" }} />
+            AQS
+          </span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <span style={{ width: "10px", height: "10px", background: "#ef4444", opacity: 0.5, borderRadius: "2px", display: "inline-block" }} />
+            B. Caldeira
+          </span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <span style={{ width: "10px", height: "10px", background: "#22d3ee", opacity: 0.5, borderRadius: "2px", display: "inline-block" }} />
+            B. Aquecimento
+          </span>
         </div>
       </div>
 
