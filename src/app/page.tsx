@@ -92,11 +92,17 @@ export default function Home() {
     return () => clearInterval(t);
   }, [carregar]);
 
+  // Assim que a primeira leitura chegar, mostra-a logo (nao espera pelos 30s)
+  useEffect(() => {
+    if (ultima && horaExibidaEm === null) {
+      setHoraExibidaEm(ultima.criadoEm);
+    }
+  }, [ultima, horaExibidaEm]);
+
   useEffect(() => {
     const atualizarHora = () => {
       if (ultimaRef.current) setHoraExibidaEm(ultimaRef.current.criadoEm);
     };
-    atualizarHora(); // mostra logo a primeira leitura, sem esperar 30s
     const t = setInterval(atualizarHora, 30000);
     return () => clearInterval(t);
   }, []);
