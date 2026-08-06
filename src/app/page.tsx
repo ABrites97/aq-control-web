@@ -314,7 +314,7 @@ export default function Home() {
                   x1={iv.inicio}
                   x2={iv.fim}
                   strokeOpacity={0}
-                  fill="#ffb300"
+                  fill="#22d3ee"
                   fillOpacity={0.22}
                 />
               ))}
@@ -335,7 +335,7 @@ export default function Home() {
             Retorno
           </span>
           <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-            <span style={{ width: "10px", height: "10px", background: "#ffb300", opacity: 0.5, borderRadius: "2px", display: "inline-block" }} />
+            <span style={{ width: "10px", height: "10px", background: "#22d3ee", opacity: 0.5, borderRadius: "2px", display: "inline-block" }} />
             B. Aquecimento
           </span>
         </div>
