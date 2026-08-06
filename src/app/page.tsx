@@ -17,6 +17,8 @@ type Leitura = {
   criadoEm: string;
   tempCaldeira: number;
   tempAQS: number;
+  tempIda: number | null;
+  tempRetorno: number | null;
   rele1Ligado: boolean;
   rele2Ligado: boolean;
   rele3Ligado: boolean;
@@ -269,6 +271,71 @@ export default function Home() {
           </span>
           <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
             <span style={{ width: "10px", height: "10px", background: "#22d3ee", opacity: 0.5, borderRadius: "2px", display: "inline-block" }} />
+            B. Aquecimento
+          </span>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="titulo">📈 Ida/Retorno Radiadores (24h)</div>
+        <div style={{ height: "256px", width: "100%", display: "flex", justifyContent: "center" }}>
+          <ResponsiveContainer>
+            <LineChart
+              data={dadosGrafico}
+              margin={{ top: 10, right: 15, left: -5, bottom: 0 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+              <XAxis
+                dataKey="ts"
+                type="number"
+                domain={[Date.now() - 24 * 60 * 60 * 1000, Date.now()]}
+                ticks={gerarTicksHoras(Date.now() - 24 * 60 * 60 * 1000, Date.now())}
+                interval={0}
+                tickFormatter={(v) => new Date(v).getHours() + "h"}
+                stroke="#cbd5e1"
+                fontSize={11}
+              />
+              <YAxis
+                domain={[10, 80]}
+                ticks={[10, 20, 30, 40, 50, 60, 70, 80]}
+                stroke="#cbd5e1"
+                fontSize={12}
+                width={42}
+                allowDataOverflow
+              />
+              <Tooltip
+                labelFormatter={(v) => new Date(v).toLocaleString("pt-PT")}
+                contentStyle={{ background: "#1e293b", border: "none", color: "white" }}
+              />
+
+              {intervalosBombaAquecimento.map((iv, idx) => (
+                <ReferenceArea
+                  key={"idaret-ba" + idx}
+                  x1={iv.inicio}
+                  x2={iv.fim}
+                  strokeOpacity={0}
+                  fill="#ffb300"
+                  fillOpacity={0.22}
+                />
+              ))}
+
+              <Line type="monotone" dataKey="tempIda" name="Ida" stroke="#ff5252" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="tempRetorno" name="Retorno" stroke="#40c4ff" dot={false} strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", marginTop: "10px", fontSize: "14px", flexWrap: "nowrap", overflowX: "auto", whiteSpace: "nowrap" }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <span style={{ width: "12px", height: "2px", background: "#ff5252", display: "inline-block" }} />
+            Ida
+          </span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <span style={{ width: "12px", height: "2px", background: "#40c4ff", display: "inline-block" }} />
+            Retorno
+          </span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <span style={{ width: "10px", height: "10px", background: "#ffb300", opacity: 0.5, borderRadius: "2px", display: "inline-block" }} />
             B. Aquecimento
           </span>
         </div>

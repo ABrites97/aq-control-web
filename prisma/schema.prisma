@@ -14,6 +14,8 @@ model Leitura {
   criadoEm           DateTime @default(now())
   tempCaldeira       Float
   tempAQS            Float
+  tempIda            Float?
+  tempRetorno        Float?
   rele1Ligado        Boolean
   rele2Ligado        Boolean
   rele3Ligado        Boolean

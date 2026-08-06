@@ -31,6 +31,8 @@ export async function POST(req: NextRequest) {
     data: {
       tempCaldeira: body.tempCaldeira,
       tempAQS: body.tempAQS,
+      tempIda: body.tempIda,
+      tempRetorno: body.tempRetorno,
       rele1Ligado: body.rele1Ligado,
       rele2Ligado: body.rele2Ligado,
       rele3Ligado: body.rele3Ligado,
