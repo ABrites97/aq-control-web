@@ -198,7 +198,7 @@ export default function Home() {
       </div>
 
       <div className="card">
-        <div className="titulo">📈 Histórico de Temperaturas (24h)</div>
+        <div className="titulo">📈 Histórico de Temperaturas</div>
         <div style={{ height: "256px", width: "100%", display: "flex", justifyContent: "center" }}>
           <ResponsiveContainer>
             <LineChart
@@ -277,7 +277,7 @@ export default function Home() {
       </div>
 
       <div className="card">
-        <div className="titulo">📈 Ida/Retorno Radiadores (24h)</div>
+        <div className="titulo">📈 Histórico Temp. Radiadores</div>
         <div style={{ height: "256px", width: "100%", display: "flex", justifyContent: "center" }}>
           <ResponsiveContainer>
             <LineChart
