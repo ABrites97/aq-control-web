@@ -20,7 +20,7 @@ model Leitura {
   rele2Ligado        Boolean
   rele3Ligado        Boolean
   modo               String
-  radiadoresPausados Boolean
+  radiadoresModo     String   @default("AUTO")
 
   @@index([criadoEm])
 }
@@ -29,7 +29,7 @@ model Leitura {
 model Comando {
   id        Int      @id @default(autoincrement())
   criadoEm  DateTime @default(now())
-  tipo      String   // "modo" | "radiadores_pausa" | "horario" | "temp_config"
+  tipo      String   // "modo" | "radiadores_modo" | "horario" | "temp_config"
   valor     String   // conteudo do comando (texto simples ou JSON, conforme o tipo)
   aplicado  Boolean  @default(false)
   aplicadoEm DateTime?

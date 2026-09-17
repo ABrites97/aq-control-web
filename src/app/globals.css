@@ -89,6 +89,12 @@ h1{
   box-shadow:0 0 12px #ff9800;
 }
 
+.aq-btn:disabled{
+  opacity:0.35;
+  cursor:not-allowed;
+  background:#334155;
+}
+
 .modos{
   display:flex;
   justify-content:center;

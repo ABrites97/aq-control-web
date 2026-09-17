@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       rele2Ligado: body.rele2Ligado,
       rele3Ligado: body.rele3Ligado,
       modo: body.modo,
-      radiadoresPausados: body.radiadoresPausados,
+      radiadoresModo: body.radiadoresModo,
     },
   });
 

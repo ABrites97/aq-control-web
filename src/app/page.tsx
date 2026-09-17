@@ -23,10 +23,11 @@ type Leitura = {
   rele2Ligado: boolean;
   rele3Ligado: boolean;
   modo: string;
-  radiadoresPausados: boolean;
+  radiadoresModo: string;
 };
 
 const MODOS = ["ON", "INVERNO", "VERAO", "OFF"];
+const RADIADORES_MODOS = ["AUTO", "ON", "OFF"];
 
 // Agrupa leituras consecutivas em que um rele esteve ligado, em intervalos [inicio, fim]
 function gerarIntervalos(
@@ -186,15 +187,25 @@ export default function Home() {
         <Linha label="Bomba Caldeira:" ligado={ultima.rele2Ligado} />
         <Linha label="Bomba Aquecimento:" ligado={ultima.rele3Ligado} />
 
-        <button
-          className={`aq-btn ${ultima.radiadoresPausados ? "ativo" : ""}`}
-          style={{ width: "90%" }}
-          onClick={() =>
-            enviarComando("radiadores_pausa", ultima.radiadoresPausados ? "0" : "1")
-          }
-        >
-          {ultima.radiadoresPausados ? "▶️ Retomar Radiadores" : "⏸️ Pausar Radiadores"}
-        </button>
+        <div className="titulo" style={{ fontSize: "16px", marginTop: "10px" }}>
+          ♨️ Radiadores
+        </div>
+        <div className="modos">
+          {RADIADORES_MODOS.map((r) => {
+            const caldeiraAquece = ultima.modo === "ON" || ultima.modo === "INVERNO";
+            const desativado = caldeiraAquece ? r === "ON" : r === "AUTO";
+            return (
+              <button
+                key={r}
+                className={`aq-btn ${ultima.radiadoresModo === r ? "ativo" : ""}`}
+                disabled={desativado}
+                onClick={() => enviarComando("radiadores_modo", r)}
+              >
+                {r}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="card">
